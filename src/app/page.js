@@ -1,95 +1,111 @@
-import Image from 'next/image'
-import styles from './page.module.css'
-
+"use client";
+import {signIn} from "next-auth/react";
+import {useRouter} from "next/navigation";
+import {useState} from "react";
 export default function Home() {
+  const router = useRouter();
+  const [formValue, setFormValue] = useState({
+    email: "a@gmail.com",
+    password: "123",
+  });
+
+  const inputChange = (name, value) => {
+    setFormValue((formValue) => ({
+      ...formValue,
+      [name]: value,
+    }));
+  };
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (formValue.email.length === 0) {
+      alert("Email Required");
+    } else if (formValue.password.length === 0) {
+      alert("password Required");
+    } else {
+      const callbackUrl = "/dashboard";
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: formValue.email,
+        password: formValue.password,
+        callbackUrl,
+      });
+      if (!res.error) {
+        router.replace(callbackUrl);
+      }
+    }
+  };
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className="w-50 mt-4 mx-auto">
+      <form onSubmit={submit}>
+        {/* <!-- Email input --> */}
+        <div className="form-outline mb-4">
+          <input
+            onChange={(e) => inputChange("email", e.target.value)}
+            value={formValue.email}
+            type="email"
+            id="form2Example1"
+            className="form-control"
+          />
+          <label className="form-label" for="form2Example1">
+            Email address
+          </label>
         </div>
+
+        {/* <!-- Password input --> */}
+        <div className="form-outline mb-4">
+          <input
+            onChange={(e) => inputChange("password", e.target.value)}
+            type="password"
+            value={formValue.password}
+            id="form2Example2"
+            className="form-control"
+          />
+          <label className="form-label" for="form2Example2">
+            Password
+          </label>
+        </div>
+
+        {/* <!-- 2 column grid layout for inline styling --> */}
+        <div className="row mb-4">
+          <div className="col">
+            {/* <!-- Simple link --> */}
+            <a href="#!">Forgot password?</a>
+          </div>
+        </div>
+        {/* 
+  <!-- Submit button --> */}
+        <button type="submit" className="btn btn-primary btn-block mb-4">
+          Sign in
+        </button>
+      </form>
+      {/* <!-- Register buttons --> */}
+      <div className="text-center">
+        <p>
+          Not a member? <a href="#!">Register</a>
+        </p>
+        <p>or sign up with:</p>
+        <button type="button" className="btn btn-link btn-floating mx-1">
+          <i className="fab fa-facebook-f">Facebook</i>
+        </button>
+
+        <button
+          onClick={() => signIn("google")}
+          type="button"
+          className="btn btn-link btn-floating mx-1">
+          <i className="fab fa-google">Google</i>
+        </button>
+
+        <button type="button" className="btn btn-link btn-floating mx-1">
+          <i className="fab fa-twitter">Twitter</i>
+        </button>
+        <button
+          onClick={() => signIn("github")}
+          type="button"
+          className="btn btn-link btn-floating mx-1">
+          <i className="fab fa-github">GitHub</i>
+        </button>
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    </div>
+  );
 }
